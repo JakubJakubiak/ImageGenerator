@@ -7,7 +7,6 @@ import '../background/home_page_background.dart';
 class DetailsScreen extends StatelessWidget {
   final int index;
   final detal;
-  // DetailsScreen({this.index = 0, this.detal});
   const DetailsScreen({Key? key, this.index = 0, this.detal}) : super(key: key);
 
   @override
