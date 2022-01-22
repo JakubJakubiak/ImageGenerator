@@ -1,5 +1,5 @@
 class MenuDrinking {
-  int id;
+  int id = 0;
   String url;
   String title;
   String description;
@@ -7,12 +7,12 @@ class MenuDrinking {
   String fullDescription;
 
   MenuDrinking({
-    this.id,
-    this.url,
-    this.title,
-    this.description,
-    this.listDescription,
-    this.fullDescription,
+    this.id = 0,
+    this.url = "",
+    this.title = "",
+    this.description = "",
+    this.listDescription = "",
+    this.fullDescription = "",
   });
 }
 

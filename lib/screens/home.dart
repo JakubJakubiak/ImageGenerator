@@ -25,7 +25,7 @@ class _Home extends State<Home> with SingleTickerProviderStateMixin {
     ),
   ];
 
-  TabController _tabController;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _Home extends State<Home> with SingleTickerProviderStateMixin {
         color: Colors.blueGrey,
         height: 50,
         animationDuration: Duration(milliseconds: 600),
-        backgroundColor: null,
+        backgroundColor: Colors.blueGrey,
         animationCurve: Curves.elasticOut,
         buttonBackgroundColor: Colors.blueGrey,
         items: _iconList,

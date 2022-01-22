@@ -6,7 +6,7 @@ import 'background/home_page_background.dart';
 
 class Tab1 extends StatefulWidget {
   final String detal;
-  const Tab1({Key key, this.detal = 'locations'}) : super(key: key);
+  const Tab1({Key? key, this.detal = 'locations'}) : super(key: key);
 
   @override
   createState() => _ChooseLocationState();
@@ -28,6 +28,7 @@ class _ChooseLocationState extends State<Tab1> {
             child: Stack(children: <Widget>[
               HomePageBackground(
                 screenHeight: MediaQuery.of(context).size.height,
+                key: const Key('background'),
               ),
               ListView.builder(
                   itemCount: detal.length,
@@ -50,7 +51,7 @@ class _ChooseLocationState extends State<Tab1> {
                                 child: Stack(children: <Widget>[
                                   Hero(
                                     tag: detal[index].id,
-                                    child: Image.network(detal[index].url ?? "",
+                                    child: Image.network(detal[index].url,
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 120,
@@ -59,12 +60,12 @@ class _ChooseLocationState extends State<Tab1> {
                                   Padding(
                                       padding: const EdgeInsets.only(top: 120),
                                       child: ListTile(
-                                        title: Text(detal[index].title ?? "",
+                                        title: Text(detal[index].title,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18)),
-                                        subtitle: Text(
-                                            detal[index].description ?? ""),
+                                        subtitle:
+                                            Text(detal[index].description),
                                       )),
                                 ])))
                       ])),

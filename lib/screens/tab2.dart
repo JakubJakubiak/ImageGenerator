@@ -6,7 +6,7 @@ import 'background/home_page_background.dart';
 
 class Tab2 extends StatefulWidget {
   final String detal;
-  const Tab2({Key key, this.detal = 'drinkings'}) : super(key: key);
+  const Tab2({Key? key, this.detal = 'drinkings'}) : super(key: key);
 
   @override
   createState() => _ChooseLocationState();
@@ -23,11 +23,12 @@ class _ChooseLocationState extends State<Tab2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
+        body: SizedBox(
             height: MediaQuery.of(context).size.height,
             child: Stack(children: <Widget>[
               HomePageBackground(
                 screenHeight: MediaQuery.of(context).size.height,
+                key: const Key('background'),
               ),
               ListView.builder(
                   itemCount: detal.length,
@@ -45,12 +46,12 @@ class _ChooseLocationState extends State<Tab2> {
                                           builder: (context) => DetailsScreen(
                                               index: index, detal: detal))),
                                 },
-                            child: Container(
+                            child: SizedBox(
                                 height: 200,
                                 child: Stack(children: <Widget>[
                                   Hero(
                                     tag: detal[index].id,
-                                    child: Image.network(detal[index].url ?? "",
+                                    child: Image.network(detal[index].url,
                                         width:
                                             MediaQuery.of(context).size.width,
                                         height: 120,
@@ -59,12 +60,12 @@ class _ChooseLocationState extends State<Tab2> {
                                   Padding(
                                       padding: const EdgeInsets.only(top: 120),
                                       child: ListTile(
-                                        title: Text(detal[index].title ?? "",
+                                        title: Text(detal[index].title,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18)),
-                                        subtitle: Text(
-                                            detal[index].description ?? ""),
+                                        subtitle:
+                                            Text(detal[index].description),
                                       )),
                                 ])))
                       ])),

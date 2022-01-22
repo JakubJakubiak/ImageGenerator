@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HomePageBackground extends StatelessWidget {
   final screenHeight;
 
-  const HomePageBackground({Key key, @required this.screenHeight})
+  const HomePageBackground({required Key key, @required this.screenHeight})
       : super(key: key);
 
   @override

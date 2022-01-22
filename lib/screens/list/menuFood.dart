@@ -7,12 +7,12 @@ class MenuFood {
   String fullDescription;
 
   MenuFood({
-    this.id,
-    this.url,
-    this.title,
-    this.description,
-    this.listDescription,
-    this.fullDescription,
+    this.id = 0,
+    this.url = "",
+    this.title = "",
+    this.description = "",
+    this.listDescription = "",
+    this.fullDescription = "",
   });
 }
 
