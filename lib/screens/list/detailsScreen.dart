@@ -1,12 +1,23 @@
+import 'dart:io';
+import 'package:cat/screens/tab1.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-// import 'menuFood.dart';
-// import 'menuDrinking.dart';
-
+import 'package:path_provider/path_provider.dart';
+import '../../main.dart';
 import '../background/home_page_background.dart';
+
+import 'dart:async';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:wallpaper/wallpaper.dart';
+
+import 'package:cat/screens/list/menuFood.dart';
+// import 'menuDrinking.dart';
 
 class DetailsScreen extends StatelessWidget {
   final int index;
-  final detal;
+  final dynamic detal;
   const DetailsScreen({Key? key, this.index = 0, this.detal}) : super(key: key);
 
   @override
@@ -34,9 +45,15 @@ class DetailsScreen extends StatelessWidget {
                 borderRadius:
                     const BorderRadius.only(topLeft: Radius.circular(90)),
                 child: Card(
-                    // ignore: avoid_unnecessary_containers
-                    child: Container(
-                        child: Column(children: [
+                    child: Column(children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      primary: Colors.white, // foreground
+                      backgroundColor: Colors.blueGrey, // background
+                    ),
+                    onPressed: () {},
+                    child: Text(detal[index].description),
+                  ),
                   Text('\n' + detal[index].description + '\n',
                       style: const TextStyle(
                         fontSize: 20,
@@ -49,7 +66,7 @@ class DetailsScreen extends StatelessWidget {
                       )),
                   Text(detal[index].fullDescription + '\n',
                       style: const TextStyle(fontSize: 18, letterSpacing: 1.0)),
-                ])))),
+                ]))),
           ]),
         ]));
   }
