@@ -1,12 +1,80 @@
 import 'dart:async';
-import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'list/menuFood.dart';
-import 'list/detailsScreen.dart';
+
+import 'list/menuFood.dart'; //delate
+
 import 'background/home_page_background.dart';
 
 import 'package:wallpaper/wallpaper.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
+Future<List<Photo>> fetchPhotos(http.Client client) async {
+  final response = await client
+      .get(Uri.parse('https://jsonplaceholder.typicode.com/photos'));
+
+  // Use the compute function to run parsePhotos in a separate isolate.
+  return compute(parsePhotos, response.body);
+}
+
+// A function that converts a response body into a List<Photo>.
+List<Photo> parsePhotos(String responseBody) {
+  final parsed = jsonDecode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+}
+
+class Photo {
+  final int albumId;
+  final int id;
+  final String title;
+  final String url;
+  final String thumbnailUrl;
+
+  const Photo({
+    required this.albumId,
+    required this.id,
+    required this.title,
+    required this.url,
+    required this.thumbnailUrl,
+  });
+
+  factory Photo.fromJson(Map<String, dynamic> json) {
+    return Photo(
+      albumId: json['albumId'] as int,
+      id: json['id'] as int,
+      title: json['title'] as String,
+      url: json['url'] as String,
+      thumbnailUrl: json['thumbnailUrl'] as String,
+    );
+  }
+}
+
+class PhotosList extends StatelessWidget {
+  const PhotosList(
+      {Key? key, this.index = 0, this.id = 0, required this.photos})
+      : super(key: key);
+
+  final List<Photo> photos;
+  final int index;
+  final int id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+        tag: photos[index].thumbnailUrl,
+        child: Image.network(
+          photos[index].thumbnailUrl,
+          width: MediaQuery.of(context).size.width / 2,
+          height: MediaQuery.of(context).size.height / 2,
+          fit: BoxFit.cover,
+        ));
+  }
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -16,6 +84,10 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  List<Photo>? photos;
+
+  //  print({photos[index].thumbnailUrl});
+
   String home = "Home Screen",
       lock = "Lock Screen",
       both = "Both Screen",
@@ -24,7 +96,6 @@ class MyAppState extends State<MyApp> {
   Stream<String>? progressString;
   String? res;
   bool downloading = false;
-  bool imageGalrys = false;
 
   List<String> images = [
     "https://images.pexels.com/photos/10069890/pexels-photo-10069890.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
@@ -36,10 +107,18 @@ class MyAppState extends State<MyApp> {
     "https://images.pexels.com/photos/9676202/pexels-photo-9676202.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
     "https://images.pexels.com/photos/9308054/pexels-photo-9308054.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
   ];
+
+  get controller => null;
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
+
   var result = "Waiting to set wallpaper";
   bool _isDisable = true;
-
-  int nextImageID = 0;
 
   dynamic detal = locations;
   int index = 0;
@@ -52,59 +131,56 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Stack(children: <Widget>[
-              HomePageBackground(
-                screenHeight: MediaQuery.of(context).size.height,
-                key: const Key('backgkkround'),
-              ),
-              ListView.builder(
-                  itemCount: detal.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(left: 5, right: 5, top: 20),
-                      child: Card(
-                          child: Column(children: <Widget>[
-                        GestureDetector(
-                            onTap: () => {
-                                  Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                          builder: (context) =>
-                                              imageGalry(index: index))),
-                                },
-                            child: SizedBox(
-                                height: 200,
-                                child: Stack(children: <Widget>[
-                                  Hero(
-                                    tag: detal[index].id,
-                                    child: Image.network(detal[index].url,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        height: 120,
-                                        fit: BoxFit.cover),
-                                  ),
-                                  Padding(
-                                      padding: const EdgeInsets.only(top: 120),
-                                      child: ListTile(
-                                        title: Text(detal[index].title,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18)),
-                                        subtitle:
-                                            Text(detal[index].description),
-                                      )),
-                                ])))
-                      ])),
-                    );
-                  }),
-            ])));
+      appBar: AppBar(
+        // backgroundColor: Colors.blueGrey,
+        title: const Text("imagesUrl[index]"),
+      ),
+      body: FutureBuilder<List<Photo>>(
+        future: fetchPhotos(http.Client()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text('An error has occurred!'),
+            );
+          } else if (snapshot.hasData) {
+            return ListView.builder(
+                itemCount: snapshot.data?.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                      child: Column(
+                    children: <Widget>[
+                      GestureDetector(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height - 100,
+                          child: Stack(children: <Widget>[
+                            PhotosList(photos: snapshot.data!, index: index),
+                          ]),
+                        ),
+                        onTap: () => {
+                          print(index),
+                          Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => imageGalry(
+                                    index: index, snapshot: snapshot),
+                              )),
+                        },
+                      )
+                    ],
+                  ));
+                });
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
   }
 
   Future<void> dowloadImage(BuildContext context) async {
-    progressString = Wallpaper.imageDownloadProgress(images[nextImageID]);
+    progressString = Wallpaper.imageDownloadProgress(images[index]);
     progressString?.listen((data) {
       setState(() {
         res = data;
@@ -128,7 +204,7 @@ class MyAppState extends State<MyApp> {
   }
 
   Widget imageDownloadDialog() {
-    return Container(
+    return SizedBox(
       height: 120.0,
       width: 200.0,
       child: Card(
@@ -148,11 +224,10 @@ class MyAppState extends State<MyApp> {
     );
   }
 
-  Widget imageGalry({required int index}) {
+  Widget imageGalry({required int index, snapshot}) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        title: Text(detal[index].title),
+        title: const Text("Cat"),
       ),
       body: Container(
           margin: const EdgeInsets.only(top: 20),
@@ -164,31 +239,24 @@ class MyAppState extends State<MyApp> {
                 downloading
                     ? imageDownloadDialog()
                     : Hero(
-                        tag: detal[index].id,
+                        tag: snapshot.data[index].thumbnailUrl,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(25),
                           child: Image.network(
-                            detal[index].url,
+                            snapshot.data[index].thumbnailUrl,
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height,
                             fit: BoxFit.fill,
                           ),
                         )),
-
-                // ElevatedButton(
-                //   onPressed: () async {
-                //     setState(() {
-                //       nextImageID = Random().nextInt(images.length);
-                //       _isDisable = true;
-                //     });
-                //   },
-                //   child:
-                //    const Text("Get Random Image"),
-                // ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
                 ElevatedButton(
                   onPressed: () async {
                     return await dowloadImage(context);
                   },
                   child: const Text("please download the image"),
                 ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
                 ElevatedButton(
                   onPressed: _isDisable
                       ? null
@@ -207,6 +275,7 @@ class MyAppState extends State<MyApp> {
                         },
                   child: Text(home),
                 ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
                 ElevatedButton(
                   onPressed: _isDisable
                       ? null
@@ -220,6 +289,7 @@ class MyAppState extends State<MyApp> {
                         },
                   child: Text(lock),
                 ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
                 ElevatedButton(
                   onPressed: _isDisable
                       ? null
@@ -233,6 +303,7 @@ class MyAppState extends State<MyApp> {
                         },
                   child: Text(both),
                 ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
                 ElevatedButton(
                   onPressed: _isDisable
                       ? null
